@@ -222,7 +222,7 @@
 
       trackConversion('form_submit', {
         event_category: 'lead_generation',
-        event_label: selectedService && selectedService.value ? selectedService.value : 'unspecified_service'
+        event_label: selectedService?.value || 'unspecified_service'
       });
 
       btn.textContent = 'Sending…';
