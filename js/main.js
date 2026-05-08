@@ -15,6 +15,45 @@
   const heroParticles = document.querySelector('.hero-particles');
   const stickyBar  = document.getElementById('sticky-bar');
   const contactForm = document.getElementById('contactForm');
+  const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const coarsePointerQuery = window.matchMedia('(hover: none), (pointer: coarse)');
+  const mobileViewportQuery = window.matchMedia('(max-width: 760px)');
+  const shouldReduceMotion = () =>
+    reducedMotionQuery.matches || coarsePointerQuery.matches || mobileViewportQuery.matches;
+
+  function initAnalytics() {
+    const analyticsMeta = document.querySelector('meta[name="ksc:ga4-measurement-id"]');
+    const measurementId = analyticsMeta ? analyticsMeta.content.trim() : '';
+    const isValidGa4Id = /^G-[A-Z0-9]+$/i.test(measurementId);
+
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = window.gtag || function gtag() {
+      window.dataLayer.push(arguments);
+    };
+
+    if (isValidGa4Id) {
+      const script = document.createElement('script');
+      script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+      script.async = true;
+      document.head.appendChild(script);
+      window.gtag('js', new Date());
+      window.gtag('config', measurementId, { anonymize_ip: true });
+    }
+
+    return { enabled: isValidGa4Id };
+  }
+
+  const analytics = initAnalytics();
+
+  function trackConversion(eventName, params = {}) {
+    if (analytics.enabled && typeof window.gtag === 'function') {
+      window.gtag('event', eventName, params);
+    }
+  }
+
+  function normalizeTextLabel(el) {
+    return (el.textContent || '').trim().replace(/\s+/g, ' ');
+  }
 
   /* ── Intersection Observer — reveal on scroll ──────────── */
   const revealObserver = new IntersectionObserver((entries) => {
@@ -42,10 +81,10 @@
     }
 
     /* Hero parallax — multi-layer (Feature 2) */
-    if (heroBg) {
+    if (heroBg && !shouldReduceMotion()) {
       heroBg.style.transform = `translateY(${y * 0.35}px)`;
     }
-    if (heroParticles) {
+    if (heroParticles && !shouldReduceMotion()) {
       heroParticles.style.transform = `translateY(${y * 0.18}px)`;
     }
 
@@ -108,7 +147,7 @@
     });
   }, { threshold: 0 });
 
-  if (window.innerWidth > 900) {
+  if (window.innerWidth > 900 && !shouldReduceMotion()) {
     galleryItems.forEach(img => {
       galleryObserver.observe(img);
     });
@@ -155,12 +194,36 @@
 
   document.querySelectorAll('[data-count]').forEach(el => counterObserver.observe(el));
 
+  document.querySelectorAll('a[href^="tel:"]').forEach((link) => {
+    link.addEventListener('click', () => {
+      trackConversion('click_to_call', {
+        event_category: 'engagement',
+        event_label: normalizeTextLabel(link)
+      });
+    });
+  });
+
+  document.querySelectorAll('a[href="#contact"], .nav-cta, .sticky-btn, .showcase-step-cta').forEach((link) => {
+    link.addEventListener('click', () => {
+      trackConversion('quote_cta_click', {
+        event_category: 'lead_generation',
+        event_label: normalizeTextLabel(link)
+      });
+    });
+  });
+
   /* ── Contact form ──────────────────────────────────────── */
   if (contactForm) {
     contactForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const btn     = contactForm.querySelector('.btn-submit');
       const success = document.getElementById('formSuccess');
+      const selectedService = contactForm.querySelector('#service');
+
+      trackConversion('form_submit', {
+        event_category: 'lead_generation',
+        event_label: selectedService?.value || 'unspecified_service'
+      });
 
       btn.textContent = 'Sending…';
       btn.disabled    = true;
@@ -171,6 +234,7 @@
         btn.textContent = 'Message Sent ✓';
         btn.style.background = '#22c55e';
         if (success) success.style.display = 'block';
+        trackConversion('form_submit_success', { event_category: 'lead_generation' });
 
         setTimeout(() => {
           btn.textContent      = 'Send Message';
@@ -190,7 +254,10 @@
       const target = document.querySelector(targetId);
       if (target) {
         e.preventDefault();
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        target.scrollIntoView({
+          behavior: reducedMotionQuery.matches ? 'auto' : 'smooth',
+          block: 'start'
+        });
       }
     });
   });
@@ -205,7 +272,7 @@
   /* ── Feature 7: Ambient cursor spotlight ─────────────────
      A radial gradient orb follows the cursor with ~8% lag    */
   const spotlight = document.querySelector('.cursor-spotlight');
-  if (spotlight) {
+  if (spotlight && !shouldReduceMotion()) {
     let spX = window.innerWidth / 2;
     let spY = window.innerHeight / 2;
     let targetX = spX;
@@ -229,35 +296,39 @@
 
   /* ── Feature 5: Magnetic hover — buttons ─────────────────
      Buttons shift slightly toward the cursor for a premium feel */
-  document.querySelectorAll('.btn-primary, .btn-secondary, .nav-cta, .sticky-btn').forEach(el => {
-    el.addEventListener('mousemove', (e) => {
-      const rect = el.getBoundingClientRect();
-      const x = e.clientX - rect.left - rect.width  / 2;
-      const y = e.clientY - rect.top  - rect.height / 2;
-      el.style.transform    = `translate(${x * 0.16}px, ${y * 0.16}px)`;
-      el.style.transition   = 'transform 0.1s ease';
+  if (!shouldReduceMotion()) {
+    document.querySelectorAll('.btn-primary, .btn-secondary, .nav-cta, .sticky-btn').forEach(el => {
+      el.addEventListener('mousemove', (e) => {
+        const rect = el.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width  / 2;
+        const y = e.clientY - rect.top  - rect.height / 2;
+        el.style.transform    = `translate(${x * 0.16}px, ${y * 0.16}px)`;
+        el.style.transition   = 'transform 0.1s ease';
+      });
+      el.addEventListener('mouseleave', () => {
+        el.style.transform  = '';
+        el.style.transition = 'transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94)';
+      });
     });
-    el.addEventListener('mouseleave', () => {
-      el.style.transform  = '';
-      el.style.transition = 'transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94)';
-    });
-  });
+  }
 
   /* ── Feature 5: Card tilt — service cards ─────────────────
      Cards tilt 2–3° toward cursor for depth */
-  document.querySelectorAll('.service-card').forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = (e.clientX - rect.left - rect.width  / 2) / rect.width;
-      const y = (e.clientY - rect.top  - rect.height / 2) / rect.height;
-      card.style.transform  = `translateY(-4px) rotateX(${-y * 3}deg) rotateY(${x * 3}deg)`;
-      card.style.transition = 'transform 0.1s ease, box-shadow 0.3s, border-color 0.3s';
+  if (!shouldReduceMotion()) {
+    document.querySelectorAll('.service-card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left - rect.width  / 2) / rect.width;
+        const y = (e.clientY - rect.top  - rect.height / 2) / rect.height;
+        card.style.transform  = `translateY(-4px) rotateX(${-y * 3}deg) rotateY(${x * 3}deg)`;
+        card.style.transition = 'transform 0.1s ease, box-shadow 0.3s, border-color 0.3s';
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform  = '';
+        card.style.transition = 'transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.3s, border-color 0.3s';
+      });
     });
-    card.addEventListener('mouseleave', () => {
-      card.style.transform  = '';
-      card.style.transition = 'transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.3s, border-color 0.3s';
-    });
-  });
+  }
 
   /* ── Feature 3: Before / After Slider ────────────────────
      Draggable vertical divider with auto-animate intro       */
@@ -294,6 +365,11 @@
     const baIntroObs = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (!entry.isIntersecting) return;
+        if (shouldReduceMotion()) {
+          setSliderPos(baSlider.getBoundingClientRect().left + 0.50 * baSlider.offsetWidth);
+          baIntroObs.unobserve(entry.target);
+          return;
+        }
         /* Start at 72% then animate to 50% */
         setSliderPos(baSlider.getBoundingClientRect().left + 0.72 * baSlider.offsetWidth);
         let pos = 0.72;
@@ -363,55 +439,36 @@
 
   /* ── Feature 11: Room fly-in — gallery images zoom out ────
      Images start 8% zoomed; scale to 1.0 as they enter view  */
-  const flyObs = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      const wrap = entry.target;
-      const img  = wrap.querySelector('img');
-      if (img) {
-        img.style.transition = 'transform 1.4s cubic-bezier(0.25,0.46,0.45,0.94)';
-        img.style.transform  = 'scale(1.0)';
-      }
-      wrap.classList.add('flown-in');
-      flyObs.unobserve(wrap);
-    });
-  }, { threshold: 0.15 });
-
-  /* Cache viewport height once to avoid repeated layout reads in loop */
-  const vph = window.innerHeight;
-  document.querySelectorAll('.gallery-img-wrap').forEach(wrap => {
-    const img = wrap.querySelector('img');
-    const rect = wrap.getBoundingClientRect();
-    /* Only apply initial zoom to images starting below viewport */
-    if (img && rect.top >= vph) {
-      img.style.transform = 'scale(1.08)';
-    } else {
-      wrap.classList.add('flown-in');
-    }
-    flyObs.observe(wrap);
-  });
-
-  /* ── Feature 4: Blueprint mode — gallery hero image ────────
-     On scroll-in: image briefly shifts to blueprint render   */
-  const bpTarget  = document.querySelector('.blueprint-img-filter');
-  const bpOverlay = document.querySelector('.blueprint-overlay');
-
-  if (bpTarget && bpOverlay) {
-    const bpObs = new IntersectionObserver((entries) => {
+  if (!shouldReduceMotion()) {
+    const flyObs = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (!entry.isIntersecting) return;
-        /* Activate blueprint look */
-        bpOverlay.classList.add('active');
-        bpTarget.classList.add('blueprint-on');
-        /* After 1.6s reveal the real photo */
-        setTimeout(() => {
-          bpOverlay.classList.remove('active');
-          bpTarget.classList.remove('blueprint-on');
-        }, 1600);
-        bpObs.unobserve(entry.target);
+        const wrap = entry.target;
+        const img  = wrap.querySelector('img');
+        if (img) {
+          img.style.transition = 'transform 1.4s cubic-bezier(0.25,0.46,0.45,0.94)';
+          img.style.transform  = 'scale(1.0)';
+        }
+        wrap.classList.add('flown-in');
+        flyObs.unobserve(wrap);
       });
-    }, { threshold: 0.45 });
-    bpObs.observe(bpTarget.closest('.gallery-img-wrap'));
+    }, { threshold: 0.15 });
+
+    /* Cache viewport height once to avoid repeated layout reads in loop */
+    const vph = window.innerHeight;
+    document.querySelectorAll('.gallery-img-wrap').forEach(wrap => {
+      const img = wrap.querySelector('img');
+      const rect = wrap.getBoundingClientRect();
+      /* Only apply initial zoom to images starting below viewport */
+      if (img && rect.top >= vph) {
+        img.style.transform = 'scale(1.08)';
+      } else {
+        wrap.classList.add('flown-in');
+      }
+      flyObs.observe(wrap);
+    });
+  } else {
+    document.querySelectorAll('.gallery-img-wrap').forEach(wrap => wrap.classList.add('flown-in'));
   }
 
   /* ── Feature 15: Gallery lightbox ────────────────────────

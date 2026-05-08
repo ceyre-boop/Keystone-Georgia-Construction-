@@ -265,6 +265,34 @@ a   { text-decoration: none; color: inherit; }
   color: rgba(255,255,255,0.5);
 }
 
+.trust-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px clamp(20px, 6vw, 60px);
+  background: linear-gradient(135deg, rgba(232,103,26,0.12), rgba(232,103,26,0.05));
+  border-top: 1px solid rgba(232,103,26,0.25);
+  border-bottom: 1px solid rgba(232,103,26,0.2);
+  text-align: center;
+}
+
+.trust-strip p {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+}
+
+.trust-strip span {
+  color: rgba(232,103,26,0.65);
+}
+
+.trust-strip a {
+  color: var(--orange);
+  font-weight: 700;
+}
+
 @keyframes fadeUp {
   to { opacity: 1; transform: translateY(0); }
 }
@@ -1158,28 +1186,6 @@ html { scroll-snap-type: y proximity; scroll-padding-top: 64px; }
   line-height: 1;
 }
 
-/* ── Feature 4: Blueprint Mode ───────────────────────────── */
-.blueprint-overlay {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(64,156,255,0.2) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(64,156,255,0.2) 1px, transparent 1px);
-  background-size: 32px 32px;
-  z-index: 3;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.55s ease;
-}
-.blueprint-overlay.active { opacity: 1; }
-
-.blueprint-img-filter {
-  transition: filter 0.55s ease;
-}
-.blueprint-img-filter.blueprint-on {
-  filter: sepia(1) hue-rotate(190deg) brightness(0.5) contrast(1.8) saturate(3);
-}
-
 /* ── Feature 6: Scroll-Synced Showcase ──────────────────── */
 #showcase {
   background: var(--black);
@@ -1271,7 +1277,16 @@ html { scroll-snap-type: y proximity; scroll-padding-top: 64px; }
   top: 0; left: 0;
   will-change: transform;
 }
-@media (prefers-reduced-motion: reduce) { .cursor-spotlight { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+    scroll-snap-type: none;
+  }
+  .cursor-spotlight,
+  .hero-particles {
+    display: none;
+  }
+}
 
 /* ── Feature 8: Sticky bar hover underline ──────────────── */
 .sticky-phone {
@@ -1373,3 +1388,104 @@ html { scroll-snap-type: y proximity; scroll-padding-top: 64px; }
   outline: none;
 }
 
+/* ── Additional mobile polish ────────────────────────────── */
+@media (max-width: 760px) {
+  .section {
+    padding: clamp(64px, 12vw, 88px) 18px;
+  }
+
+  #hero {
+    min-height: 540px;
+    height: 100svh;
+  }
+
+  .hero-content {
+    padding: 0 18px;
+    max-width: 100%;
+  }
+
+  .trust-strip {
+    gap: 8px;
+    padding: 12px 14px;
+  }
+
+  .trust-strip p {
+    font-size: 12px;
+  }
+
+  .hero-sub br {
+    display: none;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .hero-buttons .btn-primary,
+  .hero-buttons .btn-secondary {
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .hero-scroll-cue {
+    bottom: 18px;
+  }
+
+  .nav-links {
+    max-height: calc(100svh - 64px);
+    overflow-y: auto;
+  }
+
+  .reviews-grid,
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #sticky-bar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 16px;
+  }
+
+  .sticky-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 560px) {
+  .gallery-strip {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .gallery-item:nth-child(1),
+  .gallery-item:nth-child(2),
+  .gallery-item:nth-child(3),
+  .gallery-item:nth-child(4),
+  .gallery-item:nth-child(5),
+  .gallery-item:nth-child(6),
+  .gallery-item:nth-child(7),
+  .gallery-item:nth-child(8),
+  .gallery-item--wide {
+    grid-column: 1 / -1;
+    height: clamp(210px, 58vw, 300px);
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .hero-particles,
+  .cursor-spotlight {
+    display: none;
+  }
+  .gallery-item:hover .gallery-img-wrap,
+  .gallery-item:hover .gallery-img-wrap img,
+  .service-card:hover,
+  .btn-primary:hover,
+  .btn-secondary:hover,
+  .sticky-btn:hover {
+    transform: none;
+  }
+}
