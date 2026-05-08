@@ -1158,28 +1158,6 @@ html { scroll-snap-type: y proximity; scroll-padding-top: 64px; }
   line-height: 1;
 }
 
-/* ── Feature 4: Blueprint Mode ───────────────────────────── */
-.blueprint-overlay {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(64,156,255,0.2) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(64,156,255,0.2) 1px, transparent 1px);
-  background-size: 32px 32px;
-  z-index: 3;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.55s ease;
-}
-.blueprint-overlay.active { opacity: 1; }
-
-.blueprint-img-filter {
-  transition: filter 0.55s ease;
-}
-.blueprint-img-filter.blueprint-on {
-  filter: sepia(1) hue-rotate(190deg) brightness(0.5) contrast(1.8) saturate(3);
-}
-
 /* ── Feature 6: Scroll-Synced Showcase ──────────────────── */
 #showcase {
   background: var(--black);
@@ -1373,3 +1351,91 @@ html { scroll-snap-type: y proximity; scroll-padding-top: 64px; }
   outline: none;
 }
 
+/* ── Additional mobile polish ────────────────────────────── */
+@media (max-width: 760px) {
+  .section {
+    padding: clamp(64px, 12vw, 88px) 18px;
+  }
+
+  #hero {
+    min-height: 540px;
+    height: 100svh;
+  }
+
+  .hero-content {
+    padding: 0 18px;
+    max-width: 100%;
+  }
+
+  .hero-sub br {
+    display: none;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .hero-buttons .btn-primary,
+  .hero-buttons .btn-secondary {
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .hero-scroll-cue {
+    bottom: 18px;
+  }
+
+  .nav-links {
+    max-height: calc(100svh - 64px);
+    overflow-y: auto;
+  }
+
+  .reviews-grid,
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #sticky-bar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 16px;
+  }
+
+  .sticky-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 560px) {
+  .gallery-strip {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .gallery-item:nth-child(1),
+  .gallery-item:nth-child(2),
+  .gallery-item:nth-child(3),
+  .gallery-item:nth-child(4),
+  .gallery-item:nth-child(5),
+  .gallery-item:nth-child(6),
+  .gallery-item:nth-child(7),
+  .gallery-item:nth-child(8),
+  .gallery-item--wide {
+    grid-column: 1 / -1;
+    height: clamp(210px, 58vw, 300px);
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .gallery-item:hover .gallery-img-wrap,
+  .gallery-item:hover .gallery-img-wrap img,
+  .service-card:hover,
+  .btn-primary:hover,
+  .btn-secondary:hover,
+  .sticky-btn:hover {
+    transform: none;
+  }
+}

@@ -391,29 +391,6 @@
     flyObs.observe(wrap);
   });
 
-  /* ── Feature 4: Blueprint mode — gallery hero image ────────
-     On scroll-in: image briefly shifts to blueprint render   */
-  const bpTarget  = document.querySelector('.blueprint-img-filter');
-  const bpOverlay = document.querySelector('.blueprint-overlay');
-
-  if (bpTarget && bpOverlay) {
-    const bpObs = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        /* Activate blueprint look */
-        bpOverlay.classList.add('active');
-        bpTarget.classList.add('blueprint-on');
-        /* After 1.6s reveal the real photo */
-        setTimeout(() => {
-          bpOverlay.classList.remove('active');
-          bpTarget.classList.remove('blueprint-on');
-        }, 1600);
-        bpObs.unobserve(entry.target);
-      });
-    }, { threshold: 0.45 });
-    bpObs.observe(bpTarget.closest('.gallery-img-wrap'));
-  }
-
   /* ── Feature 15: Gallery lightbox ────────────────────────
      Tap / click a gallery image to expand it full-screen     */
   function openLightbox(imgEl) {
