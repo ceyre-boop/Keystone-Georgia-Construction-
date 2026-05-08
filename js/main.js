@@ -15,10 +15,11 @@
   const heroParticles = document.querySelector('.hero-particles');
   const stickyBar  = document.getElementById('sticky-bar');
   const contactForm = document.getElementById('contactForm');
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const isCoarsePointer = window.matchMedia('(hover: none), (pointer: coarse)').matches;
-  const isMobileViewport = window.innerWidth <= 760;
-  const shouldReduceMotion = prefersReducedMotion || isCoarsePointer || isMobileViewport;
+  const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const coarsePointerQuery = window.matchMedia('(hover: none), (pointer: coarse)');
+  const mobileViewportQuery = window.matchMedia('(max-width: 760px)');
+  const shouldReduceMotion = () =>
+    reducedMotionQuery.matches || coarsePointerQuery.matches || mobileViewportQuery.matches;
 
   function initAnalytics() {
     const analyticsMeta = document.querySelector('meta[name="ksc:ga4-measurement-id"]');
@@ -50,6 +51,10 @@
     }
   }
 
+  function normalizeTextLabel(el) {
+    return (el.textContent || '').trim().replace(/\s+/g, ' ');
+  }
+
   /* ── Intersection Observer — reveal on scroll ──────────── */
   const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -76,10 +81,10 @@
     }
 
     /* Hero parallax — multi-layer (Feature 2) */
-    if (heroBg && !shouldReduceMotion) {
+    if (heroBg && !shouldReduceMotion()) {
       heroBg.style.transform = `translateY(${y * 0.35}px)`;
     }
-    if (heroParticles && !shouldReduceMotion) {
+    if (heroParticles && !shouldReduceMotion()) {
       heroParticles.style.transform = `translateY(${y * 0.18}px)`;
     }
 
@@ -142,7 +147,7 @@
     });
   }, { threshold: 0 });
 
-  if (window.innerWidth > 900 && !shouldReduceMotion) {
+  if (window.innerWidth > 900 && !shouldReduceMotion()) {
     galleryItems.forEach(img => {
       galleryObserver.observe(img);
     });
@@ -193,7 +198,7 @@
     link.addEventListener('click', () => {
       trackConversion('click_to_call', {
         event_category: 'engagement',
-        event_label: (link.textContent || '').trim().replace(/\s+/g, ' ')
+        event_label: normalizeTextLabel(link)
       });
     });
   });
@@ -202,7 +207,7 @@
     link.addEventListener('click', () => {
       trackConversion('quote_cta_click', {
         event_category: 'lead_generation',
-        event_label: (link.textContent || '').trim().replace(/\s+/g, ' ')
+        event_label: normalizeTextLabel(link)
       });
     });
   });
@@ -250,7 +255,7 @@
       if (target) {
         e.preventDefault();
         target.scrollIntoView({
-          behavior: prefersReducedMotion ? 'auto' : 'smooth',
+          behavior: reducedMotionQuery.matches ? 'auto' : 'smooth',
           block: 'start'
         });
       }
@@ -267,7 +272,7 @@
   /* ── Feature 7: Ambient cursor spotlight ─────────────────
      A radial gradient orb follows the cursor with ~8% lag    */
   const spotlight = document.querySelector('.cursor-spotlight');
-  if (spotlight && !shouldReduceMotion) {
+  if (spotlight && !shouldReduceMotion()) {
     let spX = window.innerWidth / 2;
     let spY = window.innerHeight / 2;
     let targetX = spX;
@@ -291,7 +296,7 @@
 
   /* ── Feature 5: Magnetic hover — buttons ─────────────────
      Buttons shift slightly toward the cursor for a premium feel */
-  if (!shouldReduceMotion) {
+  if (!shouldReduceMotion()) {
     document.querySelectorAll('.btn-primary, .btn-secondary, .nav-cta, .sticky-btn').forEach(el => {
       el.addEventListener('mousemove', (e) => {
         const rect = el.getBoundingClientRect();
@@ -309,7 +314,7 @@
 
   /* ── Feature 5: Card tilt — service cards ─────────────────
      Cards tilt 2–3° toward cursor for depth */
-  if (!shouldReduceMotion) {
+  if (!shouldReduceMotion()) {
     document.querySelectorAll('.service-card').forEach(card => {
       card.addEventListener('mousemove', (e) => {
         const rect = card.getBoundingClientRect();
@@ -360,7 +365,7 @@
     const baIntroObs = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (!entry.isIntersecting) return;
-        if (shouldReduceMotion) {
+        if (shouldReduceMotion()) {
           setSliderPos(baSlider.getBoundingClientRect().left + 0.50 * baSlider.offsetWidth);
           baIntroObs.unobserve(entry.target);
           return;
@@ -434,7 +439,7 @@
 
   /* ── Feature 11: Room fly-in — gallery images zoom out ────
      Images start 8% zoomed; scale to 1.0 as they enter view  */
-  if (!shouldReduceMotion) {
+  if (!shouldReduceMotion()) {
     const flyObs = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (!entry.isIntersecting) return;
