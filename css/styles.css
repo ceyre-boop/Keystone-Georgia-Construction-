@@ -135,9 +135,26 @@ a   { text-decoration: none; color: inherit; }
 .hero-bg {
   position: absolute;
   inset: -10%;
-  background: url('https://github.com/user-attachments/assets/0f374111-c840-4e7a-8d80-9865b2efe391') center/cover no-repeat;
+  background:
+    radial-gradient(ellipse at 38% 45%, rgba(232,103,26,0.14) 0%, transparent 58%),
+    radial-gradient(ellipse at 72% 60%, rgba(232,103,26,0.06) 0%, transparent 48%),
+    linear-gradient(160deg, #0d0d0d 0%, #111008 45%, #0a0a0a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   will-change: transform;
   transition: transform 0.1s linear;
+  overflow: hidden;
+}
+
+.hero-logo-bg {
+  width: min(72vw, 680px);
+  height: auto;
+  opacity: 0.07;
+  pointer-events: none;
+  user-select: none;
+  filter: blur(0.4px);
+  flex-shrink: 0;
 }
 
 .hero-overlay {
@@ -1531,4 +1548,128 @@ html { scroll-snap-type: y proximity; scroll-padding-top: 64px; }
   .sticky-btn:hover {
     transform: none;
   }
+}
+
+/* ── Mobile browser chrome polish ───────────────────────── */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  #sticky-bar {
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  }
+  #footer {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
+  }
+}
+
+/* Prevent text size inflation on rotate (iOS Safari) */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+/* ── Service cards: richer hover ────────────────────────── */
+.service-card {
+  transition: border-color 0.3s, transform 0.35s cubic-bezier(0.34,1.56,0.64,1),
+              box-shadow 0.3s;
+}
+.service-icon {
+  transition: background 0.25s, transform 0.25s;
+}
+.service-card:hover .service-icon {
+  background: rgba(232,103,26,0.22);
+  transform: scale(1.08) rotate(-3deg);
+}
+
+/* ── Review cards: subtle glow ──────────────────────────── */
+.review-card {
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.review-card:hover {
+  border-color: rgba(232,103,26,0.22);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+}
+
+/* ── Nav active link indicator ──────────────────────────── */
+.nav-links a {
+  position: relative;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0; right: 0;
+  height: 2px;
+  background: var(--orange);
+  border-radius: 2px;
+  transform: scaleX(0);
+  transition: transform 0.25s cubic-bezier(0.25,0.46,0.45,0.94);
+  transform-origin: center;
+}
+.nav-links a:hover::after { transform: scaleX(1); }
+
+/* ── Hero logo watermark on mobile ──────────────────────── */
+@media (max-width: 760px) {
+  .hero-logo-bg {
+    width: min(88vw, 420px);
+    opacity: 0.05;
+  }
+}
+
+/* ── Smooth image loading: fade in when loaded ──────────── */
+img {
+  transition: opacity 0.4s ease;
+}
+img[loading="lazy"] {
+  opacity: 0;
+}
+img.loaded, img[loading="lazy"].loaded {
+  opacity: 1;
+}
+
+/* ── Gallery caption always visible on touch ────────────── */
+@media (hover: none) {
+  .gallery-caption {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Improve contact form on mobile ─────────────────────── */
+@media (max-width: 540px) {
+  .form-input,
+  .form-select,
+  .form-textarea {
+    font-size: 16px; /* prevents iOS zoom on focus */
+  }
+  .btn-submit {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* ── Better tap targets for mobile links ────────────────── */
+@media (max-width: 760px) {
+  .footer-links a,
+  .city-tag {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  .service-arrow {
+    padding: 8px 0;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+/* ── Why stats: stack nicely on narrow screens ───────────── */
+@media (max-width: 420px) {
+  .why-stats { grid-template-columns: 1fr; gap: 2px; }
+  .stat-card:first-child  { border-radius: 20px 20px 0 0; }
+  .stat-card:nth-child(2) { border-radius: 0; }
+  .stat-card:nth-child(3) { border-radius: 0; }
+  .stat-card:last-child   { border-radius: 0 0 20px 20px; }
+}
+
+/* ── Hero headline: prevent orphan on very small screens ─── */
+@media (max-width: 360px) {
+  .hero-headline { font-size: 30px; }
+  .hero-sub { font-size: 14px; }
+  .btn-primary, .btn-secondary { padding: 14px 24px; font-size: 14px; }
 }

@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#0A0A0A"/>
+
+  <!-- Warm gradient glow -->
+  <radialGradient id="glow" cx="50%" cy="50%" r="55%">
+    <stop offset="0%" stop-color="#E8671A" stop-opacity="0.13"/>
+    <stop offset="100%" stop-color="#0A0A0A" stop-opacity="0"/>
+  </radialGradient>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+
+  <!-- Subtle grid lines -->
+  <line x1="0" y1="315" x2="1200" y2="315" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+  <line x1="600" y1="0" x2="600" y2="630" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+
+  <!-- Orange accent bar top -->
+  <rect x="0" y="0" width="1200" height="4" fill="#E8671A"/>
+  <!-- Orange accent bar bottom -->
+  <rect x="0" y="626" width="1200" height="4" fill="#E8671A"/>
+
+  <!-- Arch icon mark (centered, large) -->
+  <g transform="translate(600,240)">
+    <!-- Left pillar -->
+    <rect x="-100" y="-10" width="20" height="90" fill="white" rx="4" opacity="0.92"/>
+    <!-- Right pillar -->
+    <rect x="80" y="-10" width="20" height="90" fill="white" rx="4" opacity="0.92"/>
+    <!-- Arch outer ring -->
+    <path d="M-100,-10 A100,100 0 0,1 100,-10" stroke="white" stroke-width="20" fill="none" stroke-linecap="square" opacity="0.92"/>
+    <!-- Keystone -->
+    <polygon points="0,-122 -26,-82 26,-82" fill="#E8671A"/>
+  </g>
+
+  <!-- Company name -->
+  <text x="600" y="355"
+        text-anchor="middle"
+        font-family="'Arial Black','Arial Bold',Arial,sans-serif"
+        font-weight="900"
+        font-size="62"
+        fill="white"
+        letter-spacing="4">KEYSTONE SOUTH</text>
+
+  <!-- Flanking lines -->
+  <line x1="80"  y1="378" x2="310" y2="378" stroke="#E8671A" stroke-width="2" opacity="0.6"/>
+  <line x1="890" y1="378" x2="1120" y2="378" stroke="#E8671A" stroke-width="2" opacity="0.6"/>
+
+  <!-- Sub-wordmark -->
+  <text x="600" y="404"
+        text-anchor="middle"
+        font-family="Arial,sans-serif"
+        font-weight="500"
+        font-size="22"
+        fill="#E8671A"
+        letter-spacing="18">CONSTRUCTION</text>
+
+  <!-- Tagline -->
+  <text x="600" y="462"
+        text-anchor="middle"
+        font-family="Arial,sans-serif"
+        font-weight="400"
+        font-size="26"
+        fill="rgba(255,255,255,0.65)"
+        letter-spacing="1">Crafting the South's Finest Homes.</text>
+
+  <!-- Divider -->
+  <line x1="490" y1="496" x2="710" y2="496" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+
+  <!-- Credentials row -->
+  <text x="600" y="530"
+        text-anchor="middle"
+        font-family="Arial,sans-serif"
+        font-weight="600"
+        font-size="16"
+        fill="rgba(255,255,255,0.45)"
+        letter-spacing="3">LICENSED  ·  BONDED  ·  INSURED  ·  35+ YEARS</text>
+
+  <!-- Phone -->
+  <text x="600" y="572"
+        text-anchor="middle"
+        font-family="'Arial Black',Arial,sans-serif"
+        font-weight="700"
+        font-size="22"
+        fill="#E8671A"
+        letter-spacing="2">770-827-9533</text>
+</svg>
