@@ -135,7 +135,7 @@ a   { text-decoration: none; color: inherit; }
 .hero-bg {
   position: absolute;
   inset: -10%;
-  background: url('https://github.com/user-attachments/assets/42b3a807-524a-4b3d-b85b-94a46541dc7f') center/cover no-repeat;
+  background: url('https://github.com/user-attachments/assets/0f374111-c840-4e7a-8d80-9865b2efe391') center/cover no-repeat;
   will-change: transform;
   transition: transform 0.1s linear;
 }
